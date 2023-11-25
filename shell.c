@@ -1,51 +1,90 @@
 #include "main.h"
-/**
- * execute_command - Matches a command with a corresponding
- *               shellby builtin function.
- * @cmd: The command to match.
- *
- * Return: void
- */
-void execute_command(char *cmd)
-{
-	char *command = (char *)malloc(sizeof(char) * strlen(cmd));
-	int status;
-	char *token = strtok(command, " ");
 
-	strcpy(command, cmd);
-	while (token != NULL)
+/**
+ * sig_handler - checks if Ctrl C is pressed
+ * @sig_num: int
+ */
+void sig_handler(int sig_num)
+{
+	if (sig_num == SIGINT)
 	{
-		if (strcmp(token, "exit") == 0)
+		_puts("\n#cisfun$ ");
+	}
+}
+
+/**
+* _EOF - handles the End of File
+* @len: return value of getline function
+* @buff: buffer
+ */
+void _EOF(int len, char *buff)
+{
+	(void)buff;
+	if (len == -1)
+	{
+		if (isatty(STDIN_FILENO))
 		{
-			exit(0);
+			_puts("\n");
+			free(buff);
 		}
-		else if (strcmp(token, "cd") == 0)
-		{
-			token = strtok(NULL, " ");
-			if (token != NULL)
-			{
-				chdir(token);
-			}
-		}
+		exit(0);
+	}
+}
+/**
+  * _isatty - verif if terminal
+  */
+
+void _isatty(void)
+{
+	if (isatty(STDIN_FILENO))
+		_puts("#cisfun$ ");
+}
+/**
+ * main - Shell
+ * Return: 0 on success
+ */
+
+int main(void)
+{
+	ssize_t len = 0;
+	char *buff = NULL, *value, *pathname, **arv;
+	size_t size = 0;
+	list_path *head = NULL;
+	void (*f)(char **);
+
+	signal(SIGINT, sig_handler);
+	while (len != EOF)
+	{
+		_isatty();
+		len = getline(&buff, &size, stdin);
+		_EOF(len, buff);
+		arv = splitstring(buff, " \n");
+		if (!arv || !arv[0])
+			execute(arv);
 		else
 		{
-			pid_t pid = fork();
-
-			if (pid == 0)
+			value = _getenv("PATH");
+			head = linkpath(value);
+			pathname = _which(arv[0], head);
+			f = checkbuild(arv);
+			if (f)
 			{
-				execlp(token, token, NULL);
-				exit(EXIT_FAILURE);
+				free(buff);
+				f(arv);
 			}
-			else if (pid < 0)
+			else if (!pathname)
+				execute(arv);
+			else if (pathname)
 			{
-				perror("fork");
-			}
-			else
-			{
-				waitpid(pid, &status, 0);
+				free(arv[0]);
+				arv[0] = pathname;
+				execute(arv);
 			}
 		}
-		token = strtok(NULL, " ");
 	}
-	free(command);
+	free_list(head);
+	freearv(arv);
+	free(buff);
+	return (0);
 }
+
