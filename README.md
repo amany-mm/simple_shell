@@ -2,9 +2,12 @@
 
 A simple UNIX command interpreter.
 
-## Features
-TODO
-
+## Resources
+* [Unix shell](https://en.wikipedia.org/wiki/Unix_shell)
+* [Thompson shell](https://en.wikipedia.org/wiki/Thompson_shell)
+* [Ken Thompson](https://en.wikipedia.org/wiki/Ken_Thompson)
+* man or help: `sh` (Run sh as well)
+  
 ## Compilation
 ```
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
