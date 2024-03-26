@@ -39,6 +39,6 @@ $
 
 ## Environment
 * Language: C
-* OS: Ubuntu 18.04.6 LTS
-* Compiler: gcc 7.5.0
+* OS: Ubuntu
+* Compiler: gcc
 * Style guidelines: [Betty style](https://github.com/alx-tools/Betty/wiki)
